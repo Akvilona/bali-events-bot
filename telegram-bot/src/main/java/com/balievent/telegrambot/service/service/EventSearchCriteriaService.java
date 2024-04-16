@@ -23,7 +23,17 @@ public class EventSearchCriteriaService {
                                      final String searchCriteria) {
         final EventSearchCriteria eventSearchCriteria = eventSearchCriteriaRepository.findByChatId(chatId)
             .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_999));
-        eventSearchCriteria.setDateFilter(searchCriteria);
+
+        if (searchCriteria.contains("search") && searchCriteria.contains("events")) {
+            // сохраняем запрос из первого окна (по какому из шести полей кликнул пользователь)
+            eventSearchCriteria.setSearchEvents(searchCriteria);
+        }
+    }
+
+    public String getSearchEvents(final Long chatId) {
+        final EventSearchCriteria eventSearchCriteria = eventSearchCriteriaRepository.findByChatId(chatId)
+            .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_999));
+        return eventSearchCriteria.getSearchEvents();
     }
 
     @Transactional
@@ -66,7 +76,6 @@ public class EventSearchCriteriaService {
         if (userDataOptional.isPresent()) {
             final EventSearchCriteria userData = userDataOptional.get();
             userData.setLocationNameList(locationNameList); // сохраняем все локации и кнопки в event_search_criteria.location_name_list
-            userData.setDateFilter("");
             return userData;
         }
         return eventSearchCriteriaRepository.save(EventSearchCriteria.builder()

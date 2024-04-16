@@ -44,8 +44,8 @@ public class EventSearchCriteria {
     @Builder.Default
     private List<String> locationNameList = new ArrayList<>();
 
-    @Column(name = "date_filter")
-    private String dateFilter;
+    @Column(name = "search_events")
+    private String searchEvents;
 
     public void toggleLocationName(final String locationName) {
 

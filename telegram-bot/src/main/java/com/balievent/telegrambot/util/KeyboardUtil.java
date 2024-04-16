@@ -184,38 +184,38 @@ public class KeyboardUtil {
     //            .build();
     //    }
 
-    public static InlineKeyboardMarkup createEventDateSelectionKeyboard() {
+    public static InlineKeyboardMarkup createEventDateSelectionKeyboard(final String eventSearchCriteriaService) {
 
         final List<InlineKeyboardButton> firstRow = new ArrayList<>();
 
         firstRow.add(InlineKeyboardButton.builder()
-            .text(TelegramButton.SEARCH_TODAY_EVENTS.getButtonText())
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_TODAY_EVENTS.getCallbackData(), TelegramButton.SEARCH_TODAY_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_TODAY_EVENTS.getCallbackData())
             .build());
 
         firstRow.add(InlineKeyboardButton.builder()
-            .text(TelegramButton.SEARCH_TOMORROW_EVENTS.getButtonText())
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_TOMORROW_EVENTS.getCallbackData(), TelegramButton.SEARCH_TOMORROW_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_TOMORROW_EVENTS.getCallbackData())
             .build());
 
         final List<InlineKeyboardButton> secondRow = new ArrayList<>();
         secondRow.add(InlineKeyboardButton.builder()
-            .text(TelegramButton.SEARCH_THIS_WEEK_EVENTS.getButtonText())
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_THIS_WEEK_EVENTS.getCallbackData(), TelegramButton.SEARCH_THIS_WEEK_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_THIS_WEEK_EVENTS.getCallbackData())
             .build());
         secondRow.add(InlineKeyboardButton.builder()
-            .text(TelegramButton.SEARCH_NEXT_WEEK_EVENTS.getButtonText())
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_NEXT_WEEK_EVENTS.getCallbackData(), TelegramButton.SEARCH_NEXT_WEEK_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_NEXT_WEEK_EVENTS.getCallbackData())
             .build());
 
         final List<InlineKeyboardButton> thirdRow = new ArrayList<>();
         thirdRow.add(InlineKeyboardButton.builder()
-            .text(TelegramButton.SEARCH_ON_THIS_WEEKEND_EVENTS.getButtonText())
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_ON_THIS_WEEKEND_EVENTS.getCallbackData(), TelegramButton.SEARCH_ON_THIS_WEEKEND_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_ON_THIS_WEEKEND_EVENTS.getCallbackData())
             .build());
 
         thirdRow.add(InlineKeyboardButton.builder()
-            .text(TelegramButton.SEARCH_SHOW_ALL_EVENTS.getButtonText())
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_SHOW_ALL_EVENTS.getCallbackData(), TelegramButton.SEARCH_SHOW_ALL_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_SHOW_ALL_EVENTS.getCallbackData())
             .build());
 
@@ -224,6 +224,9 @@ public class KeyboardUtil {
             .build();
     }
 
+    private static String textData(final String eventSearchCriteriaService, final String callbackData, final String buttonText) {
+        return eventSearchCriteriaService != null && callbackData.contains(eventSearchCriteriaService) ? "✅ " + buttonText : buttonText;
+    }
     public static InlineKeyboardMarkup createEventLocationsSelectionKeyboard(final List<String> allLocations,
                                                                              final List<String> selectedLocations) {
         final List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();

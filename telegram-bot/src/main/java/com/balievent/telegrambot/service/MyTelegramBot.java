@@ -84,10 +84,11 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     }
 
     private void processCallbackQuery(final Update update) throws TelegramApiException {
+        // проверяем  нажатие кнопки на втором окне
         if (eventLocationFilterProcess(update)) {
             return;
         }
-        // получаем имя нажатой кнопки
+        // получаем имя нажатой кнопки с первого окна (нажата одна из шести кнопок)
         final String clickedButtonName = update.getCallbackQuery().getData().toUpperCase(Locale.ROOT);
 
         final CallbackHandlerType callbackHandlerType = TelegramButton.valueOf(clickedButtonName).getCallbackHandlerType();

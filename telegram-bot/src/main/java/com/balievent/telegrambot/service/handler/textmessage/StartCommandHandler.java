@@ -46,12 +46,14 @@ public class StartCommandHandler extends TextMessageHandler {
         // сохраняем все локации и кнопку "Deselect all" в event_search_criteria.location_name_list
         eventSearchCriteriaService.saveOrUpdateEventSearchCriteria(chatId, locationNameList);
 
-        clearChat(chatId, userData);
+        clearChat(chatId, userData); // удаляем рабочее окно на экране пользователя
+
+        final String searchThisEvents = eventSearchCriteriaService.getSearchEvents(chatId); // получаем критерий поиска
 
         final SendMessage sendMessage = SendMessage.builder()
             .chatId(chatId)
             .text(TgBotConstants.EVENT_DATE_QUESTION.formatted())
-            .replyMarkup(KeyboardUtil.createEventDateSelectionKeyboard())
+            .replyMarkup(KeyboardUtil.createEventDateSelectionKeyboard(searchThisEvents))
             .build();
 
         final Message message = myTelegramBot.execute(sendMessage);
