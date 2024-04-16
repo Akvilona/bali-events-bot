@@ -24,16 +24,14 @@ public class EventSearchCriteriaService {
         final EventSearchCriteria eventSearchCriteria = eventSearchCriteriaRepository.findByChatId(chatId)
             .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_999));
 
-        if (searchCriteria.contains("search") && searchCriteria.contains("events")) {
-            // сохраняем запрос из первого окна (по какому из шести полей кликнул пользователь)
-            eventSearchCriteria.setSearchEvents(searchCriteria);
-        }
+        // сохраняем запрос из первого окна (по какому из шести полей кликнул пользователь)
+        eventSearchCriteria.setEventDateFilter(searchCriteria);
     }
 
     public String getSearchEvents(final Long chatId) {
         final EventSearchCriteria eventSearchCriteria = eventSearchCriteriaRepository.findByChatId(chatId)
             .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_999));
-        return eventSearchCriteria.getSearchEvents();
+        return eventSearchCriteria.getEventDateFilter();
     }
 
     @Transactional
@@ -55,7 +53,7 @@ public class EventSearchCriteriaService {
         final List<String> list = new ArrayList<>(locationNameList);
         list.add(TelegramButton.DESELECT_ALL_LOCATIONS.getCallbackData());
 
-        eventSearchCriteria.setLocationNameList(list);
+        eventSearchCriteria.setEventLocationNameListFiler(list);
 
         return eventSearchCriteria;
     }
@@ -65,8 +63,8 @@ public class EventSearchCriteriaService {
         final EventSearchCriteria eventSearchCriteria = eventSearchCriteriaRepository.findByChatId(chatId)
             .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_999));
 
-        eventSearchCriteria.getLocationNameList().clear();
-        eventSearchCriteria.getLocationNameList().add(TelegramButton.SELECT_ALL_LOCATIONS.getCallbackData());
+        eventSearchCriteria.getEventLocationNameListFiler().clear();
+        eventSearchCriteria.getEventLocationNameListFiler().add(TelegramButton.SELECT_ALL_LOCATIONS.getCallbackData());
         return eventSearchCriteria;
     }
 
@@ -75,7 +73,7 @@ public class EventSearchCriteriaService {
         final Optional<EventSearchCriteria> userDataOptional = eventSearchCriteriaRepository.findByChatId(chatId);
         if (userDataOptional.isPresent()) {
             final EventSearchCriteria userData = userDataOptional.get();
-            userData.setLocationNameList(locationNameList); // сохраняем все локации и кнопки в event_search_criteria.location_name_list
+            userData.setEventLocationNameListFiler(locationNameList); // сохраняем все локации и кнопки в event_search_criteria.location_name_list
             return userData;
         }
         return eventSearchCriteriaRepository.save(EventSearchCriteria.builder()

@@ -45,7 +45,7 @@ public class EventLocationsQuestionHandler extends ButtonCallbackHandler {
             .chatId(chatId)
             .messageId(update.getCallbackQuery().getMessage().getMessageId())
             .text(TgBotConstants.EVENT_LOCATIONS_QUESTION)
-            .replyMarkup(KeyboardUtil.createEventLocationsSelectionKeyboard(locationIds, eventSearchCriteria.getLocationNameList()))
+            .replyMarkup(KeyboardUtil.createEventLocationsSelectionKeyboard(locationIds, eventSearchCriteria.getEventLocationNameListFiler()))
             .build();
 
         myTelegramBot.execute(editMessageText);

@@ -48,12 +48,10 @@ public class StartCommandHandler extends TextMessageHandler {
 
         clearChat(chatId, userData); // удаляем рабочее окно на экране пользователя
 
-        final String searchThisEvents = eventSearchCriteriaService.getSearchEvents(chatId); // получаем критерий поиска
-
         final SendMessage sendMessage = SendMessage.builder()
             .chatId(chatId)
             .text(TgBotConstants.EVENT_DATE_QUESTION.formatted())
-            .replyMarkup(KeyboardUtil.createEventDateSelectionKeyboard(searchThisEvents))
+            .replyMarkup(KeyboardUtil.createEventDateSelectionKeyboard(null))
             .build();
 
         final Message message = myTelegramBot.execute(sendMessage);

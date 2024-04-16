@@ -39,20 +39,20 @@ public class EventSearchCriteria {
     @Column(name = "chat_id", unique = true, nullable = false)
     private Long chatId;
 
-    @Column(name = "location_name_list")
+    @Column(name = "event_location_name_list_filter")
     @JdbcTypeCode(SqlTypes.JSON)
     @Builder.Default
-    private List<String> locationNameList = new ArrayList<>();
+    private List<String> eventLocationNameListFiler = new ArrayList<>();
 
-    @Column(name = "search_events")
-    private String searchEvents;
+    @Column(name = "event_date_filter")
+    private String eventDateFilter;
 
     public void toggleLocationName(final String locationName) {
 
-        if (locationNameList.contains(locationName)) {
-            locationNameList.remove(locationName);
+        if (eventLocationNameListFiler.contains(locationName)) {
+            eventLocationNameListFiler.remove(locationName);
         } else {
-            locationNameList.add(locationName);
+            eventLocationNameListFiler.add(locationName);
         }
     }
 }
