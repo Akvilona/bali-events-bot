@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
+    Event findEventsById(Long id);
+
     List<Event> findEventsByStartDateBetween(LocalDateTime start, LocalDateTime end);
 
     Page<Event> findEventsByStartDateBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);

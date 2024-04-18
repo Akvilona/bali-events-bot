@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -28,16 +29,16 @@ public class MediaHandler {
 
     public void handle(final Long chatId, final UserData userData) {
         try {
-            final List<InputMediaPhoto> eventPhotos = findEventPhotos(userData);
+            final List<InputMediaPhoto> eventPhotos = findEventPhotos(userData); // получаем список ссылок фотографий на текущую дату
             if (eventPhotos.isEmpty()) {
                 log.info("No event photos found for chatId: {}", chatId);
                 return;
             }
-
+            // в зависимости от количества фотографий отсылаем блок фотографий пользователю
             final List<Message> messageList = eventPhotos.size() == 1
                                               ? sendSinglePhoto(chatId, eventPhotos)
                                               : sendMultiplePhotos(chatId, eventPhotos);
-
+            // сохраняем список идентификаторов фотографий
             userDataService.updateMediaIdList(messageList, chatId);
         } catch (TelegramApiException e) {
             log.error("Failed to send media", e);
@@ -59,15 +60,16 @@ public class MediaHandler {
     }
 
     private List<InputMediaPhoto> findEventPhotos(final UserData userData) {
-        final int currentPageIndex = userData.getCurrentEventPage() - 1;
+        final int currentPageIndex = userData.getCurrentEventPage() - 1; // текущая страница
+        // ищем записи на текущую дату для текущей страницы, и указанным количеством на этой странице
         return eventService.findEvents(userData.getSearchEventDate(), currentPageIndex, Settings.PAGE_SIZE)
             .stream()
             .map(event -> {
-                final InputMediaPhoto inputMediaPhoto = new InputMediaPhoto();
-                inputMediaPhoto.setMedia(event.getImageUrl());
+                final InputMediaPhoto inputMediaPhoto = new InputMediaPhoto(); // создаем контейнер TELEGRAM фотографий
+                inputMediaPhoto.setMedia(event.getImageUrl()); // берем ссылку на фото из postgres.public.event.event_url
                 return inputMediaPhoto;
             })
-            .toList();
+            .toList(); // добавляем в список
     }
 
     private List<Message> sendSinglePhoto(final Long chatId,
@@ -82,4 +84,35 @@ public class MediaHandler {
         return myTelegramBot.execute(sendMediaGroup);
     }
 
+    public void location(final Long chatId, final UserData userData, final String textMessage) {
+        final Map<String, Long> locationMap = userData.getLocationMap();
+        final Long value = locationMap.get(textMessage);
+        try {
+            final List<InputMediaPhoto> eventPhotos = getEventsById(value); // получаем список из одной фотографии
+            if (eventPhotos.isEmpty()) {
+                log.info("No event photos found for chatId: {}", chatId);
+                return;
+            }
+            // в зависимости от количества фотографий отсылаем блок фотографий пользователю
+            final List<Message> messageList = eventPhotos.size() == 1
+                                              ? sendSinglePhoto(chatId, eventPhotos)
+                                              : sendMultiplePhotos(chatId, eventPhotos);
+            // сохраняем список идентификаторов фотографий
+            userDataService.updateMediaIdList(messageList, chatId);
+        } catch (TelegramApiException e) {
+            log.error("Failed to send media", e);
+        }
+    }
+
+    private List<InputMediaPhoto> getEventsById(final Long userEventsId) {
+        // ищем запись по идентификатору
+        return eventService.findEventsById(userEventsId)
+            .stream()
+            .map(event -> {
+                final InputMediaPhoto inputMediaPhoto = new InputMediaPhoto(); // создаем контейнер TELEGRAM фотографий
+                inputMediaPhoto.setMedia(event.getImageUrl()); // берем ссылку на фото из postgres.public.event.event_url
+                return inputMediaPhoto;
+            })
+            .toList(); // добавляем в список
+    }
 }

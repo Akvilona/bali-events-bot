@@ -7,10 +7,13 @@ import com.balievent.telegrambot.constant.TextMessageHandlerType;
 import com.balievent.telegrambot.constant.TgBotConstants;
 import com.balievent.telegrambot.exceptions.ServiceException;
 import com.balievent.telegrambot.service.handler.callback.ButtonCallbackHandler;
+import com.balievent.telegrambot.service.handler.callback.MessageBuilder;
 import com.balievent.telegrambot.service.handler.textmessage.TextMessageHandler;
+import com.balievent.telegrambot.service.service.UserDataService;
 import com.balievent.telegrambot.util.DateUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -29,6 +32,10 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final Map<TextMessageHandlerType, TextMessageHandler> textMessageHandlers;
     private final Map<CallbackHandlerType, ButtonCallbackHandler> callbackHandlers;
     private final TelegramBotProperties telegramBotProperties;
+    @Autowired
+    private MessageBuilder messageBuilder;
+    @Autowired
+    private UserDataService userDataService;
 
     public MyTelegramBot(
         final @Lazy Map<TextMessageHandlerType, TextMessageHandler> textMessageHandlers,
@@ -66,16 +73,19 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     private void processTextMessage(final Update update) throws TelegramApiException {
         final String messageText = update.getMessage().getText(); // ТЕКСТ СООБЩЕНИЯ
-        if (messageText.contains("/start")) {
+        if (messageText.contains("/start")) { // проверяем что это начало TELEGRAM BOT программы
             textMessageHandlers.get(TextMessageHandlerType.START_COMMAND).handle(update); // СОЗДАНИЕ ФИЛЬТРА ИЗ (6-И) КНОПОК ЭТО public class StartCommandHandler()
             return;
         }
 
-        if (DateUtil.isCalendarMonthChanged(messageText)) {
+        if (DateUtil.isCalendarMonthChanged(messageText)) { // если текст сообщения соответствует одному из названию месяца "JANUARY", "FEBRUARY", "MARCH"
             textMessageHandlers.get(TextMessageHandlerType.CALENDAR_MONTH_CHANGED).handle(update);
-        } else if (DateUtil.isDateSelected(messageText)) {
-            textMessageHandlers.get(TextMessageHandlerType.DATE_SELECTED).handle(update);
+        } else if (DateUtil.isDateSelected(messageText)) { // если текст сообщения соответствует формату '/DD_MM_YYYY'
+            textMessageHandlers.get(TextMessageHandlerType.DATE_SELECTED).handle(update); // идем по выбранной дате -> '/01_04_2024' переходим в метод DateSelectedHandler()
+        } else if (messageBuilder.isRequestLocalMap(update)) { // проверяем наличие фразы в текущих локациях
+            textMessageHandlers.get(TextMessageHandlerType.LOCATION_COMMAND).handle(update); // идем показать выбранную локацию -> class LocationCommandHandler()
         } else {
+            // удаляем текстовое сообщение, которое бот не может обработать
             execute(DeleteMessage.builder()
                 .chatId(update.getMessage().getChatId())
                 .messageId(update.getMessage().getMessageId())
@@ -84,15 +94,15 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     }
 
     private void processCallbackQuery(final Update update) throws TelegramApiException {
-        // проверяем  нажатие кнопки на втором окне
+        // проверяем нажатие кнопки на втором окне
         if (eventLocationFilterProcess(update)) {
             return;
         }
-        // получаем имя нажатой кнопки с первого окна (нажата одна из шести кнопок)
+        // получаем имя нажатой кнопки с первого, второго или третьего окна
         final String clickedButtonName = update.getCallbackQuery().getData().toUpperCase(Locale.ROOT);
-
+        // переход на окно описанное в enum TelegramButton -> enum CallbackHandlerType
         final CallbackHandlerType callbackHandlerType = TelegramButton.valueOf(clickedButtonName).getCallbackHandlerType();
-        callbackHandlers.get(callbackHandlerType).handle(update);
+        callbackHandlers.get(callbackHandlerType).handle(update); // переход на -> public CallbackHandlerType()
     }
 
     //Метод который обрабатывает фильтры по локация
@@ -103,6 +113,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
         //(чтобы не попадать снова в хендлер с выбором локации)
         if (TelegramButton.MONTH_EVENTS_PAGE.getCallbackData().equals(update.getCallbackQuery().getData())) {
             // Попадаем сюда если пользователь выбрал кнопку Next -> MONTH_EVENTS_PAGE
+            // и еще сюда приводит кнопка 'Back to month'
             callbackHandlers.get(CallbackHandlerType.MONTH_EVENTS_PAGE).handle(update);
             return true;
 
@@ -114,6 +125,4 @@ public class MyTelegramBot extends TelegramLongPollingBot {
         }
         return false;
     }
-
 }
-

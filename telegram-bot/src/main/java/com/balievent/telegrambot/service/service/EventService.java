@@ -2,7 +2,7 @@ package com.balievent.telegrambot.service.service;
 
 import com.balievent.telegrambot.model.entity.Event;
 import com.balievent.telegrambot.repository.EventRepository;
-import com.balievent.telegrambot.util.MessageBuilderUtil;
+import com.balievent.telegrambot.service.handler.callback.MessageBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +44,11 @@ public class EventService {
             .limit(SHOW_ROW_COUNT)
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return MessageBuilderUtil.formatMessageForEventsGroupedByDay(eventMap);
+        return MessageBuilder.formatMessageForEventsGroupedByDay(eventMap);
     }
 
     /**
-     * This method retrieves a message containing a list of events grouped by day for a given date range.
+     * Этот метод извлекает сообщение, содержащее список событий, сгруппированных по дням для заданного диапазона дат.
      *
      * @param localDate the date for the user query
      * @param dayStart  the starting day of the query range. Minimum value: 1
@@ -57,12 +58,14 @@ public class EventService {
     public String getMessageWithEventsGroupedByDayFull(final LocalDate localDate,
                                                        final int dayStart,
                                                        final int dayFinish) {
+        // получаем список всех событий за указанный месяц и указанное количество дней
         final Map<LocalDate, List<Event>> eventMap = getEventsAndGroupByDay(localDate, dayStart, dayFinish)
             .entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return MessageBuilderUtil.formatMessageForEventsGroupedByDay(eventMap);
+        // получаем из всех полей таблицы Event список в виде таких строк: '/01_04_2024 : 8 events'
+        return MessageBuilder.formatMessageForEventsGroupedByDay(eventMap);
     }
 
     public int countEvents(final LocalDate localDate) {
@@ -98,4 +101,12 @@ public class EventService {
             .collect(Collectors.groupingBy(event -> event.getStartDate().toLocalDate()));
     }
 
+    public List<Event> findEventsById(final Long id) {
+        final Event event = eventRepository.findEventsById(id);
+        final List<Event> eventList = new ArrayList<>();
+        if (event != null) {
+            eventList.add(event);
+        }
+        return eventList;
+    }
 }

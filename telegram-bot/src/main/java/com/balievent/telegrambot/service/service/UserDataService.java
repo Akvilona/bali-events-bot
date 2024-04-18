@@ -12,7 +12,9 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -32,7 +34,7 @@ public class UserDataService {
     }
 
     /**
-     * Updates the calendar store with the selected date or the changed calendar month.
+     * для пользователя обновляем хранилище добавляя дату или измененный календарный месяц.
      *
      * @param update         - the update event from Telegram
      * @param isMonthChanged - a flag indicating whether the calendar month has changed
@@ -44,12 +46,12 @@ public class UserDataService {
         final String text = update.getMessage().getText();
 
         final UserData userData = getUserData(chatId);
-
+        // получаем из строки дату или берем данные из старого значения
         final LocalDate localDate = isMonthChanged
                                     ? DateUtil.convertToDateTimeCalendarMonthChanged(text, userData.getSearchEventDate())
                                     : DateUtil.parseSelectedDate(text, userData.getSearchEventDate());
 
-        userData.setSearchEventDate(localDate);
+        userData.setSearchEventDate(localDate); // сохраняем в базу дату запроса -> postgres.public.user_data.search_event_date
 
         return userData;
     }
@@ -72,12 +74,14 @@ public class UserDataService {
         return userDataRepository.save(getDefaultUserData(chatId));
     }
 
+    @Transactional
     public UserData incrementCurrentPage(final Long chatId) {
         final UserData userData = getUserData(chatId);
         userData.setCurrentEventPage(userData.getCurrentEventPage() + 1);
         return userData;
     }
 
+    @Transactional
     public UserData decrementCurrentPage(final Long chatId) {
         final UserData userData = userDataRepository.findById(chatId)
             .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001));
@@ -121,8 +125,8 @@ public class UserDataService {
             .map(Message::getMessageId)
             .toList();
 
-        final UserData userData = getUserData(chatId);
-        userData.setMediaMessageIdList(idList);
+        final UserData userData = getUserData(chatId); // получаем запись пользователя
+        userData.setMediaMessageIdList(idList); // сохраняем идентификаторы картинок в postgres.public.user_data.media_message_id_list
     }
 
     @Transactional
@@ -148,4 +152,14 @@ public class UserDataService {
             .toList();
     }
 
+    @Transactional
+    public void saveOrUpdateLocationMap(final Map<String, Long> locationMap, final Long chatId) {
+        final UserData userData = getUserData(chatId);
+        userData.setLocationMap(locationMap);
+    }
+
+    public Map<String, Long> getLocationMap(final Long chatId) {
+        final UserData userData = getUserData(chatId);
+        return userData != null ? userData.getLocationMap() : new HashMap<>();
+    }
 }

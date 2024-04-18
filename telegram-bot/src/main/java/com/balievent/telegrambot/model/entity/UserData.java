@@ -16,7 +16,9 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -52,4 +54,8 @@ public class UserData {
     @Builder.Default
     private List<Integer> mediaMessageIdList = new ArrayList<>();
 
+    @Column(name = "location_map")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Builder.Default
+    private Map<String, Long> locationMap = new HashMap<>();
 }

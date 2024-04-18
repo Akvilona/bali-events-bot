@@ -2,7 +2,6 @@ package com.balievent.telegrambot.util;
 
 import com.balievent.telegrambot.constant.TelegramButton;
 import com.balievent.telegrambot.constant.TgBotConstants;
-import jakarta.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -106,9 +105,9 @@ public class KeyboardUtil {
     }
 
     /**
-     * Generates an inline keyboard markup for navigating between pages of day events.
-     * Can include buttons for the first, previous, next, and last pages (if pageCount > 0)
-     * Also includes a button to return to the month view
+     * Создает разметку для навигации между страницами.
+     * Создает кнопки для первой, предыдущей, следующей и последней страниц (если количество страниц > 0).
+     * Всегда есть кнопка для возврата к просмотру за месяц
      *
      * @param currentPage The current page number.
      * @param pageCount   The total number of pages.
@@ -185,38 +184,38 @@ public class KeyboardUtil {
     //            .build();
     //    }
 
-    public static InlineKeyboardMarkup createEventDateSelectionKeyboard(@Nullable final String eventDateFilter) {
+    public static InlineKeyboardMarkup createEventDateSelectionKeyboard(final String eventSearchCriteriaService) {
 
         final List<InlineKeyboardButton> firstRow = new ArrayList<>();
 
         firstRow.add(InlineKeyboardButton.builder()
-            .text(textData(eventDateFilter, TelegramButton.SEARCH_TODAY_EVENTS.getCallbackData(), TelegramButton.SEARCH_TODAY_EVENTS.getButtonText()))
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_TODAY_EVENTS.getCallbackData(), TelegramButton.SEARCH_TODAY_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_TODAY_EVENTS.getCallbackData())
             .build());
 
         firstRow.add(InlineKeyboardButton.builder()
-            .text(textData(eventDateFilter, TelegramButton.SEARCH_TOMORROW_EVENTS.getCallbackData(), TelegramButton.SEARCH_TOMORROW_EVENTS.getButtonText()))
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_TOMORROW_EVENTS.getCallbackData(), TelegramButton.SEARCH_TOMORROW_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_TOMORROW_EVENTS.getCallbackData())
             .build());
 
         final List<InlineKeyboardButton> secondRow = new ArrayList<>();
         secondRow.add(InlineKeyboardButton.builder()
-            .text(textData(eventDateFilter, TelegramButton.SEARCH_THIS_WEEK_EVENTS.getCallbackData(), TelegramButton.SEARCH_THIS_WEEK_EVENTS.getButtonText()))
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_THIS_WEEK_EVENTS.getCallbackData(), TelegramButton.SEARCH_THIS_WEEK_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_THIS_WEEK_EVENTS.getCallbackData())
             .build());
         secondRow.add(InlineKeyboardButton.builder()
-            .text(textData(eventDateFilter, TelegramButton.SEARCH_NEXT_WEEK_EVENTS.getCallbackData(), TelegramButton.SEARCH_NEXT_WEEK_EVENTS.getButtonText()))
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_NEXT_WEEK_EVENTS.getCallbackData(), TelegramButton.SEARCH_NEXT_WEEK_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_NEXT_WEEK_EVENTS.getCallbackData())
             .build());
 
         final List<InlineKeyboardButton> thirdRow = new ArrayList<>();
         thirdRow.add(InlineKeyboardButton.builder()
-            .text(textData(eventDateFilter, TelegramButton.SEARCH_ON_THIS_WEEKEND_EVENTS.getCallbackData(), TelegramButton.SEARCH_ON_THIS_WEEKEND_EVENTS.getButtonText()))
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_ON_THIS_WEEKEND_EVENTS.getCallbackData(), TelegramButton.SEARCH_ON_THIS_WEEKEND_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_ON_THIS_WEEKEND_EVENTS.getCallbackData())
             .build());
 
         thirdRow.add(InlineKeyboardButton.builder()
-            .text(textData(eventDateFilter, TelegramButton.SEARCH_SHOW_ALL_EVENTS.getCallbackData(), TelegramButton.SEARCH_SHOW_ALL_EVENTS.getButtonText()))
+            .text(textData(eventSearchCriteriaService, TelegramButton.SEARCH_SHOW_ALL_EVENTS.getCallbackData(), TelegramButton.SEARCH_SHOW_ALL_EVENTS.getButtonText()))
             .callbackData(TelegramButton.SEARCH_SHOW_ALL_EVENTS.getCallbackData())
             .build());
 
