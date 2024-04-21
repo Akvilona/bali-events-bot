@@ -114,12 +114,14 @@ public class KeyboardUtil {
      * @return The generated InlineKeyboardMarkup.
      */
     public static InlineKeyboardMarkup getDayEventsKeyboard(final int currentPage, final int pageCount) {
-        final List<InlineKeyboardButton> monthBackButtons = new ArrayList<>();
+        final List<InlineKeyboardButton> monthBackButtons = new ArrayList<>(); // список кнопок
+        // добавляем кнопку возврата
         monthBackButtons.add(InlineKeyboardButton.builder()
             .text(TelegramButton.MONTH_EVENTS_PAGE.getButtonText())
             .callbackData(TelegramButton.MONTH_EVENTS_PAGE.getCallbackData())
             .build());
 
+        // если страниц нет, то добавляем кнопку в конечный объект и выходим
         if (pageCount == 0) {
             return InlineKeyboardMarkup.builder()
                 .keyboard(List.of(monthBackButtons))
@@ -127,6 +129,7 @@ public class KeyboardUtil {
         }
 
         final List<InlineKeyboardButton> paginationButtons = new ArrayList<>();
+        // создаем конечную кнопку
         if (currentPage > 2) {
             final TelegramButton firstEventsPageButton = TelegramButton.FIRST_EVENTS_PAGE;
             paginationButtons.add(InlineKeyboardButton.builder()
@@ -135,6 +138,7 @@ public class KeyboardUtil {
                 .build());
         }
 
+        // создаем промежуточную кнопку
         if (currentPage > 1) {
             final TelegramButton previousEventsPageButton = TelegramButton.PREVIOUS_EVENTS_PAGE;
             paginationButtons.add(InlineKeyboardButton.builder()
@@ -143,6 +147,7 @@ public class KeyboardUtil {
                 .build());
         }
 
+        // создаем промежуточную кнопку
         if (currentPage < pageCount) {
             final TelegramButton nextEventsPageButton = TelegramButton.NEXT_EVENTS_PAGE;
             paginationButtons.add(InlineKeyboardButton.builder()
@@ -151,6 +156,7 @@ public class KeyboardUtil {
                 .build());
         }
 
+        // создаем начальную кнопку
         if (currentPage < pageCount - 1) {
             final TelegramButton lastEventsPageButton = TelegramButton.LAST_EVENTS_PAGE;
             paginationButtons.add(InlineKeyboardButton.builder()
@@ -158,31 +164,11 @@ public class KeyboardUtil {
                 .callbackData(lastEventsPageButton.getCallbackData())
                 .build());
         }
-
+        // объединяем списки кнопок в общий список
         return InlineKeyboardMarkup.builder()
             .keyboard(List.of(paginationButtons, monthBackButtons))
             .build();
     }
-
-    //    public static ReplyKeyboardMarkup getMainMenuKeyboard() {
-    //        final List<KeyboardRow> keyboard = new ArrayList<>();
-    //
-    //        final KeyboardRow row = new KeyboardRow();
-    //        row.add(TelegramButton.CHANGE_SEARCH_PARAMETERS.getButtonText());
-    //        keyboard.add(row);
-    //
-    //        final KeyboardRow settingsAndHelp = new KeyboardRow();
-    //        settingsAndHelp.add(TelegramButton.SETTINGS_AND_HELP.getButtonText());
-    //        keyboard.add(settingsAndHelp);
-    //
-    //        final KeyboardRow contactAndFavorite = new KeyboardRow();
-    //        contactAndFavorite.add(TelegramButton.CONTACT_US.getButtonText());
-    //        keyboard.add(contactAndFavorite);
-    //
-    //        return ReplyKeyboardMarkup.builder()
-    //            .keyboard(keyboard)
-    //            .build();
-    //    }
 
     public static InlineKeyboardMarkup createEventDateSelectionKeyboard(final String eventSearchCriteriaService) {
 

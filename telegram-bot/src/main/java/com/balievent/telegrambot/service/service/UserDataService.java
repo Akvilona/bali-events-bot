@@ -33,6 +33,10 @@ public class UserDataService {
             .build();
     }
 
+    public UserData getUserDataById(final Long chatId) {
+        return userDataRepository.findUserDataById(chatId);
+    }
+
     /**
      * для пользователя обновляем хранилище добавляя дату или измененный календарный месяц.
      *
@@ -133,6 +137,12 @@ public class UserDataService {
     public void updateLastBotMessageId(final Integer messageId, final Long chatId) {
         final UserData userData = getUserData(chatId);
         userData.setLastBotMessageId(messageId);
+    }
+
+    @Transactional
+    public void updateLocationMessageId(final Integer messageId, final Long chatId) {
+        final UserData userData = getUserData(chatId);
+        userData.setLocationMessageId(messageId);
     }
 
     @Transactional

@@ -80,11 +80,14 @@ public class DateUtil {
     }
 
     public static boolean isDateSelected(final String text) {
+        final String datePattern = "/\\d{2}_\\d{2}_\\d{4}";
+        return Pattern.matches(datePattern, text);
+        /*
         final String datePatternWithDot = "\\d{2}\\.\\d{2}\\.\\d{4}";
         final String datePatternWithUnderscore = "/\\d{2}_\\d{2}_\\d{4}";
         return Pattern.matches(datePatternWithDot, text)
             || Pattern.matches(datePatternWithUnderscore, text)
-            || DateUtil.isContainsTextMonth(text);
+            || DateUtil.isContainsTextMonth(text);*/
     }
 
     public static String convertToLocalDateSelected(final String text, final LocalDate currentLocalDate) {

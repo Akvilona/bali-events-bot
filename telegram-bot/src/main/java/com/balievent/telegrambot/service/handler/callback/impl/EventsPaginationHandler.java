@@ -19,8 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessages;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -63,6 +65,7 @@ public class EventsPaginationHandler extends ButtonCallbackHandler {
 
     @Override
     public void handle(final Update update) throws TelegramApiException {
+        // данные по текущему пользователю
         final UserData userData = updateUserData(update);
         // получаем список событий на указанную дату, но не больше восьми
         // здесь происходит ошибка когда нажимаешь на кнопку <[1/3] потому что userData.getCurrentEventPage() = 0
@@ -84,8 +87,34 @@ public class EventsPaginationHandler extends ButtonCallbackHandler {
 
         myTelegramBot.execute(editMessageText); // отправляем на сервер сформированное сообщение
 
-        removeMediaMessage(chatId, userData); // удаляем блок картинок
-        mediaHandler.handle(chatId, userData); // создаем блок картинок
+        removeMediaMessage(chatId, userData);   // удаляем блок картинок
+        removeTextMessage(update, userData);    // удаляем текст локации
+        mediaHandler.handle(chatId, userData);  // создаем блок картинок
+    }
+
+    private void removeTextMessage(final Update update, final UserData userData) throws TelegramApiException {
+        // этот метод отрабатывает при нажатии по КНОПКЕ!!!!
+        final CallbackQuery callbackQuery = update.getCallbackQuery();
+        if (callbackQuery != null) {
+            final String chatId = callbackQuery.getMessage().getChatId().toString();
+            final Integer messageId = userData.getLocationMessageId();
+
+            // Пытаемся удалить сообщение
+            try {
+                myTelegramBot.execute(DeleteMessage.builder()
+                    .chatId(chatId)
+                    .messageId(messageId)
+                    .build());
+
+                // Удаляем поле из объекта UserData, если сообщение было успешно удалено
+                userData.setLocationMessageId(null);
+            } catch (TelegramApiException e) {
+                // Если возникает ошибка, сообщение не существует
+                System.out.println("Сообщение с messageId " + messageId + " не существует.");
+            }
+        } else {
+            System.out.println("Обновление не содержит CallbackQuery.");
+        }
     }
 
     private void removeMediaMessage(final Long chatId, final UserData userData) {

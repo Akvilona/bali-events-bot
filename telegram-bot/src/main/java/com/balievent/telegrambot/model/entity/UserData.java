@@ -49,6 +49,9 @@ public class UserData {
     @Column(name = "last_user_message_id")
     private Integer lastUserMessageId;
 
+    @Column(name = "location_message_id")
+    private Integer locationMessageId;
+
     @Column(name = "media_message_id_list")
     @JdbcTypeCode(SqlTypes.JSON)
     @Builder.Default

@@ -7,6 +7,8 @@ package com.balievent.telegrambot.service.handler.callback;
 import com.balievent.telegrambot.constant.Settings;
 import com.balievent.telegrambot.model.entity.Event;
 import com.balievent.telegrambot.service.service.UserDataService;
+import com.balievent.telegrambot.util.CommonUtil;
+import com.balievent.telegrambot.util.GetGoogleMapLinkUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +56,7 @@ public class MessageBuilder {
         String processed = input.replaceAll("[^\\p{Alnum} ]", "");
         // Заменяем пробелы на подчеркивания
         processed = processed.replace(" ", "_")
-                             .replace("__", "_");
+            .replace("__", "_");
         return processed;
     }
 
@@ -84,5 +86,25 @@ public class MessageBuilder {
         final String messageText = update.getMessage().getText().trim(); // ТЕКСТ СООБЩЕНИЯ
         final Map<String, Long> locationMap = userDataService.getLocationMap(update.getMessage().getChatId()); // список возможны переходов
         return locationMap.containsKey(messageText);
+    }
+
+    public String buildEventsMessage(final List<Event> eventList) {
+        // это цикл по всем событиям на текущий день на данной локации.
+        final StringBuilder result = new StringBuilder();
+        String line = "";
+
+        for (int i = 0; i < eventList.size(); i++) {
+
+            final Event event = eventList.get(i);
+
+            line = "NAME: " + event.getEventName() + "\n"
+                + "Time: Begin: " + event.getStartDate().toLocalTime().toString() + "\n"
+                + "Time: End: " + event.getEndDate().toLocalTime().toString() + "\n"
+                + CommonUtil.getLink("Buy Tickets Now!", event.getEventUrl()) + "\n"
+                + GetGoogleMapLinkUtil.getGoogleMap("Location on Google map", event.getCoordinates()) + "\n";
+
+            result.append(line);
+        }
+        return result.toString();
     }
 }

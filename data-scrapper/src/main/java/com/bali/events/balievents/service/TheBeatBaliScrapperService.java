@@ -48,6 +48,7 @@ public class TheBeatBaliScrapperService implements ScrapperService {
 
     /**
      * Здесь указывается сайт который мы будем считывать
+     * https://thebeatbali.com/bali-events/
      *
      * @return - корневой домен сайта
      */

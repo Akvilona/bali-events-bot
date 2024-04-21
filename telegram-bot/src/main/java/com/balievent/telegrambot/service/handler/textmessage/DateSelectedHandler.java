@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -37,22 +38,22 @@ public class DateSelectedHandler extends TextMessageHandler {
     public void handle(final Update update) throws TelegramApiException {
         final Long chatId = update.getMessage().getChatId();
         final UserData userData = userDataService.updateCalendarDate(update, false);
-        userDataService.saveUserMessageId(update.getMessage().getMessageId(), chatId);
+        userDataService.saveUserMessageId(update.getMessage().getMessageId(), chatId);      // сохраняем ID сообщения в postgres.public.user_data.last_user_message_id
 
-        clearChat(chatId, userData);
+        clearChat(chatId, userData);                                                        // удаляем с экрана все сохраненные объекты (картинки)
+        removeTextMessage(update, userData);                                                // удаляем текст локации
+        final LocalDate eventsDateFor = userData.getSearchEventDate();                      // дата запроса
 
-        final LocalDate eventsDateFor = userData.getSearchEventDate();
+        final int currentPage = 1;                                                          //Всегда начинаем с первой страницы
+        final List<Event> eventList = eventService.findEvents(eventsDateFor, currentPage - 1, Settings.PAGE_SIZE); // получаем список событий для одной страницы
+        final int eventCount = eventService.countEvents(eventsDateFor);                     // получаем общее количество событий
+        final int pageCount = (eventCount + Settings.PAGE_SIZE - 1) / Settings.PAGE_SIZE;   // получаем номер текущей страницы
 
-        final int currentPage = 1; //Всегда начинаем с первой страницы
-        final List<Event> eventList = eventService.findEvents(eventsDateFor, currentPage - 1, Settings.PAGE_SIZE);
-        final int eventCount = eventService.countEvents(eventsDateFor);
-        final int pageCount = (eventCount + Settings.PAGE_SIZE - 1) / Settings.PAGE_SIZE;
+        userDataService.updatePageInfo(chatId, pageCount, currentPage);                     // сохраняем общее количество страниц и текущую страницу
 
-        userDataService.updatePageInfo(chatId, pageCount, currentPage);
-
-        final ReplyKeyboard replyKeyboard = KeyboardUtil.getDayEventsKeyboard(currentPage, pageCount);
+        final ReplyKeyboard replyKeyboard = KeyboardUtil.getDayEventsKeyboard(currentPage, pageCount); // создаем кнопки навигации по страницам
         final String displayDate = eventsDateFor.format(Settings.PRINT_DATE_TIME_FORMATTER); // форматируем дату из 2024-05-01 -> 01.05.2024
-        // формирует строки переходов на событие по ссылке <a href="https://
+        // формирует строки по названия локаций за один день Пример: /1_Amazing_View_Sunset_Party
         final String eventsBriefMessage = messageBuilder.buildBriefEventsMessage(currentPage, eventList, chatId);
         // формируем сообщение для TELEGRAM сервера
         final SendMessage sendMessage = SendMessage.builder()
@@ -64,8 +65,34 @@ public class DateSelectedHandler extends TextMessageHandler {
             .build();
 
         final Message message = myTelegramBot.execute(sendMessage);
-        userDataService.updateLastBotMessageId(message.getMessageId(), chatId);
-        mediaHandler.handle(chatId, userData);
+        userDataService.updateLastBotMessageId(message.getMessageId(), chatId);     // сохранили MessageId в postgres.public.user_data.last_bot_message_id
+        mediaHandler.handle(chatId, userData);                                      // создание группы картинок
+    }
+
+    private void removeTextMessage(final Update update, final UserData userData) throws TelegramApiException {
+        // этот метод отрабатывает при нажатии на ТЕКСТОВОЕ сообщение!!!
+        final Message message = update.getMessage();
+        if (message != null) {
+            // Получаем chatId и messageId для сравнения
+            final Long chatId = message.getChatId();
+            final Integer messageId = userData.getLocationMessageId();
+
+            // Пытаемся удалить сообщение
+            try {
+                myTelegramBot.execute(DeleteMessage.builder()
+                    .chatId(chatId.toString())
+                    .messageId(messageId)
+                    .build());
+
+                // Удаляем поле из объекта UserData, если сообщение было успешно удалено
+                userData.setLocationMessageId(null);
+            } catch (TelegramApiException e) {
+                // Если возникает ошибка, сообщение не существует
+                System.out.println("Сообщение с messageId " + messageId + " не существует.");
+            }
+        } else {
+            System.out.println("Обновление не содержит сообщения.");
+        }
     }
 
 }
