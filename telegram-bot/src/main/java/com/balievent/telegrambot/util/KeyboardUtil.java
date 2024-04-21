@@ -114,13 +114,21 @@ public class KeyboardUtil {
      * @return The generated InlineKeyboardMarkup.
      */
     public static InlineKeyboardMarkup getDayEventsKeyboard(final int currentPage, final int pageCount) {
-        final List<InlineKeyboardButton> monthBackButtons = new ArrayList<>(); // список кнопок
-        // добавляем кнопку возврата
-        monthBackButtons.add(InlineKeyboardButton.builder()
-            .text(TelegramButton.MONTH_EVENTS_PAGE.getButtonText())
-            .callbackData(TelegramButton.MONTH_EVENTS_PAGE.getCallbackData())
-            .build());
 
+        final List<InlineKeyboardButton> monthBackButtons = new ArrayList<>(); // список кнопок
+
+        // добавляем одну кнопку возврата для карточки конечной локации для них (currentPage == 0 && pageCount == 0)
+        if (currentPage == 0 && pageCount == 0) {
+            monthBackButtons.add(InlineKeyboardButton.builder()
+                .text(TelegramButton.MONTH_DAY_PAGE.getButtonText())
+                .callbackData(TelegramButton.MONTH_EVENTS_PAGE.getCallbackData())
+                .build());
+        } else {
+            monthBackButtons.add(InlineKeyboardButton.builder()
+                .text(TelegramButton.MONTH_EVENTS_PAGE.getButtonText())
+                .callbackData(TelegramButton.MONTH_EVENTS_PAGE.getCallbackData())
+                .build());
+        }
         // если страниц нет, то добавляем кнопку в конечный объект и выходим
         if (pageCount == 0) {
             return InlineKeyboardMarkup.builder()

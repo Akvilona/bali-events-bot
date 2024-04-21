@@ -56,7 +56,7 @@ public class MonthEventsHandler extends ButtonCallbackHandler {
         removeMediaMessage(chatId, userData);           // удаляем группу картинок
         removeTextMessage(update, userData);            // удаляем текст локации
         myTelegramBot.execute(editMessageText);         // перезаписываем ТЕКСТОВОЕ сообщение
-        mediaHandler.handle(chatId, userData);          // создание группы картинок
+        // mediaHandler.handle(chatId, userData);       // создание группы картинок
     }
 
     private void removeTextMessage(final Update update, final UserData userData) throws TelegramApiException {
