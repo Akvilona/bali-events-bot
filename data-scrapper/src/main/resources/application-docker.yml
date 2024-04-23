@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/postgres
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://telegram-bot-postgres:5432/postgres
+    username: ${TELEGRAM_BOT_PG_NAME}
+    password: ${TELEGRAM_BOT_PG_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate

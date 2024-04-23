@@ -8,9 +8,9 @@ spring:
   application:
     name: bali-events
   datasource:
-    url: jdbc:postgresql://db:5432/postgres
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://telegram-bot-postgres:5432/postgres
+    username: ${TELEGRAM_BOT_PG_NAME}
+    password: ${TELEGRAM_BOT_PG_PASSWORD}
   jpa:
     open-in-view: false
     hibernate:
@@ -18,6 +18,7 @@ spring:
     properties:
       hibernate:
         format_sql: 'true'
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 logging:
   level:
@@ -28,5 +29,5 @@ logging:
 com:
   balievent:
     bot:
-      token:
-      username:
+      token: ${TELEGRAM_TOKEN}
+      username: ${TELEGRAM_NAME}
