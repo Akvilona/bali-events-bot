@@ -120,8 +120,8 @@ public class KeyboardUtil {
         // добавляем одну кнопку возврата для карточки конечной локации для них (currentPage == 0 && pageCount == 0)
         if (currentPage == 0 && pageCount == 0) {
             monthBackButtons.add(InlineKeyboardButton.builder()
-                .text(TelegramButton.MONTH_DAY_PAGE.getButtonText())
-                .callbackData(TelegramButton.MONTH_EVENTS_PAGE.getCallbackData())
+                .text(TelegramButton.DAY_EVENT_PAGE.getButtonText())
+                .callbackData(TelegramButton.DAY_EVENT_PAGE.getCallbackData())
                 .build());
         } else {
             monthBackButtons.add(InlineKeyboardButton.builder()

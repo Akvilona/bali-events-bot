@@ -41,9 +41,9 @@ public class EventDateQuestionHandler extends ButtonCallbackHandler {
         // в переменной selectedDate сейчас лежит фильтр по датам из первого окна
         // этот метод добавляет / удаляет локации
         eventSearchCriteriaService.updateSearchCriteria(chatId, selectedDate);
-
+        // получаем все данные из таблицы event_search_criteria
         final EventSearchCriteria eventSearchCriteria = eventSearchCriteriaService.getEventSearchCriteria(chatId);
-
+        // формируем строку для телеграмма
         final EditMessageText editMessageText = EditMessageText.builder()
             .chatId(chatId)
             .messageId(update.getCallbackQuery().getMessage().getMessageId())

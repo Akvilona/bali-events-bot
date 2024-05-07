@@ -37,11 +37,12 @@ public class DateSelectedHandler extends TextMessageHandler {
     @Override
     public void handle(final Update update) throws TelegramApiException {
         final Long chatId = update.getMessage().getChatId();
+        // сохраняем указанную дату и возвращаем поля таблицы user_data для данного пользователя
         final UserData userData = userDataService.updateCalendarDate(update, false);
         userDataService.saveUserMessageId(update.getMessage().getMessageId(), chatId);      // сохраняем ID сообщения в postgres.public.user_data.last_user_message_id
 
         clearChat(chatId, userData);                                                        // удаляем с экрана все сохраненные объекты (картинки)
-        removeTextMessage(update, userData);                                                // удаляем текст локации
+        removeTextMessageDate(update);    //!!!! почему-то не удаляется               // удаляем текст локации
         final LocalDate eventsDateFor = userData.getSearchEventDate();                      // дата запроса
 
         final int currentPage = 1;                                                          //Всегда начинаем с первой страницы
@@ -56,6 +57,10 @@ public class DateSelectedHandler extends TextMessageHandler {
         // формирует строки по названия локаций за один день Пример: /1_Amazing_View_Sunset_Party
         final String eventsBriefMessage = messageBuilder.buildBriefEventsMessage(currentPage, eventList, chatId);
         // формируем сообщение для TELEGRAM сервера
+        userDataService.saveUserMessageId(update.getMessage().getMessageId(), chatId);
+        // сохраняем текущую страницу и общее количество страниц
+        userDataService.updatePageInfo(chatId, pageCount, currentPage);
+
         final SendMessage sendMessage = SendMessage.builder()
             .chatId(chatId)
             .text(TgBotConstants.EVENT_LIST_TEMPLATE.formatted(displayDate, eventsBriefMessage))
@@ -69,7 +74,31 @@ public class DateSelectedHandler extends TextMessageHandler {
         mediaHandler.handle(chatId, userData);                                      // создание группы картинок
     }
 
-    private void removeTextMessage(final Update update, final UserData userData) throws TelegramApiException {
+    private void removeTextMessageDate(final Update update) throws TelegramApiException {
+        // этот метод отрабатывает при нажатии на ТЕКСТОВОЕ сообщение!!!
+        final Message message = update.getMessage();
+        if (message != null) {
+            // Получаем chatId и messageId для сравнения
+            final Long chatId = message.getChatId();
+            final Integer messageId = update.getMessage().getMessageId();
+
+            // Пытаемся удалить сообщение
+            try {
+                myTelegramBot.execute(DeleteMessage.builder()
+                    .chatId(chatId.toString())
+                    .messageId(messageId)
+                    .build());
+
+            } catch (TelegramApiException e) {
+                // Если возникает ошибка, сообщение не существует
+                System.out.println("Сообщение с messageId " + messageId + " не существует.");
+            }
+        } else {
+            System.out.println("Обновление не содержит сообщения.");
+        }
+    }
+
+    /*private void removeTextMessage(final Update update, final UserData userData) throws TelegramApiException {
         // этот метод отрабатывает при нажатии на ТЕКСТОВОЕ сообщение!!!
         final Message message = update.getMessage();
         if (message != null) {
@@ -93,6 +122,5 @@ public class DateSelectedHandler extends TextMessageHandler {
         } else {
             System.out.println("Обновление не содержит сообщения.");
         }
-    }
-
+    }*/
 }

@@ -113,10 +113,12 @@ public class MyTelegramBot extends TelegramLongPollingBot {
         //(чтобы не попадать снова в хендлер с выбором локации)
         if (TelegramButton.MONTH_EVENTS_PAGE.getCallbackData().equals(update.getCallbackQuery().getData())) {
             // Попадаем сюда если пользователь выбрал кнопку Next -> MONTH_EVENTS_PAGE
-            // и еще сюда приводит кнопка 'Back to month'
             callbackHandlers.get(CallbackHandlerType.MONTH_EVENTS_PAGE).handle(update);
             return true;
-
+        } else if (TelegramButton.DAY_EVENT_PAGE.getCallbackData().equals(update.getCallbackQuery().getData())) {
+            // Приходим сюда по кнопке 'Back to month' на карточке локации
+            callbackHandlers.get(CallbackHandlerType.DAY_EVENT_PAGE).handle(update);
+            return true;
             //Проверка по содержанию сообщения из-за того, что callback с локациями динамический и нельзя на него завязываться
         } else if (update.getCallbackQuery().getMessage() instanceof Message message
             && TgBotConstants.EVENT_LOCATIONS_QUESTION.equals(message.getText())) {

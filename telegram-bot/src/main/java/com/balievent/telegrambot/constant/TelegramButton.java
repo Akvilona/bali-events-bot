@@ -18,23 +18,11 @@ public enum TelegramButton {
     LAST_EVENTS_PAGE("last_events_page", ">> [%s/%s]", CallbackHandlerType.EVENTS_PAGINATION),
 
     //Month page buttons
-    MONTH_DAY_PAGE("month_events_page", "Back to the list for the day 📅", CallbackHandlerType.MONTH_EVENTS_PAGE),
+    DAY_EVENT_PAGE("month_events_day", "Back to the list for the day 📅", CallbackHandlerType.DAY_EVENT_PAGE),
     MONTH_EVENTS_PAGE("month_events_page", "Back to the list for the month 📅", CallbackHandlerType.MONTH_EVENTS_PAGE),
 
     PREVIOUS_MONTH_PAGE("previous_month_page", "%s", CallbackHandlerType.MONTH_PAGINATION),
     NEXT_MONTH_PAGE("next_month_page", "%s", CallbackHandlerType.MONTH_PAGINATION),
-
-    //Main menu buttons
-    //    CHANGE_SEARCH_PARAMETERS("change_search_parameters", "Change search parameters 🔍"),
-    //    SETTINGS_AND_HELP("settings_and_help", "Settings and help ⚙️"),
-    //    CONTACT_US("contact_us", "Contact us 📧"),
-    //    FAVORITE_EVENTS("favorite_events", "Favorites ❤️"),
-
-    //change search parameters buttons
-    // EVENT_DATE_SELECTION("events_date_selection", "Select dates 📅"),
-    //    SELECT_EVENT_LOCATIONS("event_locations_selection", "Select locations 🌍"),
-    //    BACK_TO_MAIN_MENU("back_to_main_menu", "Back to main menu ⬅️"),
-    //    SAVE_SEARCH_PARAMETERS("save_search_parameters", "Save search parameters ✅"),
 
     //choose event date buttons
     SEARCH_TODAY_EVENTS("search_today_events", "Today", CallbackHandlerType.EVENT_DATE_SELECTION),

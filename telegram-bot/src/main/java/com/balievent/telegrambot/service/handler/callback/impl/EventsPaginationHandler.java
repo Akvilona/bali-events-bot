@@ -68,7 +68,6 @@ public class EventsPaginationHandler extends ButtonCallbackHandler {
         // данные по текущему пользователю
         final UserData userData = updateUserData(update);
         // получаем список событий на указанную дату, но не больше восьми
-        // здесь происходит ошибка когда нажимаешь на кнопку <[1/3] потому что userData.getCurrentEventPage() = 0
         final List<Event> eventList = eventService.findEvents(userData.getSearchEventDate(), userData.getCurrentEventPage() - 1, Settings.PAGE_SIZE);
         final Long chatId = update.getCallbackQuery().getMessage().getChatId();
         // получаем список событий по которым можно кликнуть (Этот список сохранен в Базе Данных в поле postgres.public.user_data.location_map )
@@ -93,7 +92,7 @@ public class EventsPaginationHandler extends ButtonCallbackHandler {
     }
 
     private void removeTextMessage(final Update update, final UserData userData) throws TelegramApiException {
-        // этот метод отрабатывает при нажатии по КНОПКЕ!!!!
+        // метод отрабатывает при нажатии по КНОПКЕ!!!!
         final CallbackQuery callbackQuery = update.getCallbackQuery();
         if (callbackQuery != null) {
             final String chatId = callbackQuery.getMessage().getChatId().toString();

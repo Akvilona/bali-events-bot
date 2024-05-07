@@ -20,7 +20,7 @@ public class MessageBuilderUtil {
             final Event event = eventList.get(i);
             stringBuilder.append(1 + i + Settings.PAGE_SIZE * (currentPage - 1)).append(". ")
                 .append(CommonUtil.getLink(event.getEventName(), event.getEventUrl()))
-                .append("%n");
+                .append("\n");
         }
 
         return stringBuilder.toString();
@@ -35,7 +35,7 @@ public class MessageBuilderUtil {
                 .append(" : ")
                 .append(value.size())
                 .append(" events")
-                .append("%n"));
+                .append("\n"));
 
         if (stringBuilder.isEmpty()) {
             stringBuilder.append("No events");

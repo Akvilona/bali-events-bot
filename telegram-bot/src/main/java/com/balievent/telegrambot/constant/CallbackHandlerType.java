@@ -7,6 +7,7 @@ public enum CallbackHandlerType {
     EVENTS_PAGINATION,          // -> public class EventsPaginationHandler()
     SHOW_MORE_OR_LESS_EVENTS,   // -> public class ShowMoreAndLessHandler()
     MONTH_EVENTS_PAGE,          // -> public class MonthEventsHandler()
-    EVENT_START_FILTER                // -> public class StartFilterHandler()
+    DAY_EVENT_PAGE,             // -> public class DayEventsHandler()
+    EVENT_START_FILTER          // -> public class StartFilterHandler()
 
 }
